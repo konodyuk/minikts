@@ -21,7 +21,7 @@ class MatplotlibCallback:
         if plt is None:
             raise ImportError("MatplotlibCallback is available only if matplotlib is installed. "
                               "Install it with `pip install matplotlib`.")
-        if IPython is None:
+        if clear_output is None:
             raise ImportError("MatplotlibCallback is available only in Jupyter environment.")
 
     def __call__(self, report):
