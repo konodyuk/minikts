@@ -1,1 +1,1 @@
-from minikts.logging.callbacks.matplotlib import MatlpotlibCallback
+from minikts.logging.callbacks.matplotlib import MatplotlibCallback
