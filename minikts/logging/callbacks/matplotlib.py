@@ -1,6 +1,13 @@
 import attr
-import matplotlib.pyplot as plt
-from IPython.display import clear_output
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    plt = None
+try:
+    from IPython.display import clear_output
+except:
+    clear_output = None
+
 
 @attr.s
 class MatplotlibCallback:
@@ -10,7 +17,13 @@ class MatplotlibCallback:
     last_update = attr.ib(default=-1)
     last_step = attr.ib(default=-1)
     keys = attr.ib(factory=set)
-    
+    def _attrs_post_init_(self):
+        if plt is None:
+            raise ImportError("MatplotlibCallback is available only if matplotlib is installed. "
+                              "Install it with `pip install matplotlib`.")
+        if IPython is None:
+            raise ImportError("MatplotlibCallback is available only in Jupyter environment.")
+
     def __call__(self, report):
         self.append(report)
         if self.last_step - self.last_update >= self.interval:
