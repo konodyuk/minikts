@@ -11,6 +11,7 @@ setuptools.setup(
     install_requires=[
         "rich",
         "click",
+        "parse",
         "python-box",
     ],
     entry_points={
