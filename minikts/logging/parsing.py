@@ -30,4 +30,22 @@ class StreamParser:
         self.buf = str()
 
 def parse_stdout(patterns, *callbacks):
+    """Parses each stdout line in line with `patterns` argument and sequentially calls callbacks
+
+    Args:
+        patterns: tuple of patterns compatible with `parse.search` function
+        *callbacks: 
+            any functions or functors to be called from result of pattern search,
+            order matters, as callbacks can modify the pattern search dictionary
+
+    Returns:
+        Context manager redirecting stdout and parsing it line-by-line
+
+    Examples:
+        >>> import minikts.api as kts
+        >>> from lightgbm import LGBMClassifier
+        >>> with kts.parse_stdout(kts.patterns.lightgbm, kts.MatplotlibCallback(interval=50)):
+        ...     model = LGBMClassifier(n_estimators=1000)
+        ...     model.fit(x_train, y_train, eval_set=[(x_train, y_train), (x_test, y_test)])
+    """
     return redirect_stdout(StreamParser(patterns, callbacks=callbacks))
