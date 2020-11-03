@@ -220,3 +220,19 @@ def argument_mapper(**kwargs):
             res[key] = transform(df)
         return res
     return _argument_mapper
+
+def local_cache(feature):
+    """Caches input feature in scope of current run"""
+    raise NotImplementedError()
+    def _cached(df, **k):
+        res = _call(feature, df, **k)
+        return res
+    return _cached
+
+def global_cache(feature):
+    """Caches input feature in scope of current project"""
+    raise NotImplementedError()
+    def _cached(df, **k):
+        res = _call(feature, df, **k)
+        return res
+    return _cached
