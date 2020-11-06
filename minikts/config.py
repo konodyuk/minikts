@@ -1,3 +1,4 @@
+import os
 from functools import partial
 from pathlib import Path
 
@@ -8,7 +9,11 @@ def _join_path(loader, node):
     seq = loader.construct_sequence(node)
     return Path().joinpath(*seq)
 
+def _get_from_env(loader, node):
+    return os.environ.get(node.value, None)
+
 yaml.SafeLoader.add_constructor('!join_path', _join_path)
+yaml.SafeLoader.add_constructor('!env', _get_from_env)
 
 _CONFIG_VALIDATORS = dict()
 _CONFIG_REQUIRED_KEYS = [
