@@ -9,10 +9,14 @@ setuptools.setup(
     url="https://github.com/konodyuk/minikts",
     packages=setuptools.find_packages(),
     install_requires=[
-        "rich",
-        "click",
+        "attrs",
+        "click>=3.0",
         "parse",
-        "python-box",
+        "python-box[ruamel.yaml]>=5.0.0",
+        "dill",
+        "numpy",
+        "pandas",
+        "shutil",
     ],
     entry_points={
         "console_scripts": ["minikts=minikts.cli:cli"]
