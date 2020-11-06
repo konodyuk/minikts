@@ -17,6 +17,7 @@ setuptools.setup(
         "numpy",
         "pandas",
         "neptune-client<=0.4.117",
+        "PyJWT<=1.6.4"
     ],
     entry_points={
         "console_scripts": ["minikts=minikts.cli:cli"]
