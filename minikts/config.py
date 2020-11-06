@@ -17,9 +17,9 @@ yaml.SafeLoader.add_constructor('!env', _get_from_env)
 
 _CONFIG_VALIDATORS = dict()
 _CONFIG_REQUIRED_KEYS = [
-    "general.root_dir",
-    "general.experiments_dir",
-    "general.global_cache_dir",
+    "paths.root_dir",
+    "paths.experiments_dir",
+    "paths.global_cache_dir",
     "hparams",
     "neptune.api_token",
     "neptune.project_name",
@@ -36,7 +36,6 @@ def _load_config(filename, run_validators=True, check_required_keys=True):
     config = Box.from_yaml(
         filename=filename, 
         box_dots=True,
-        box_recast=_CONFIG_VALIDATORS if run_validators else None,
         Loader=yaml.SafeLoader
     )
     if check_required_keys:
@@ -45,6 +44,9 @@ def _load_config(filename, run_validators=True, check_required_keys=True):
                 config[key]
             except KeyError:
                 raise ConfigError(f"Required key {key} not found.")
+    if run_validators:
+        for key, validator in _CONFIG_VALIDATORS.items():
+            config[key] = validator(config[key])
     _CONFIG_FILENAME = None
     return config
     
@@ -79,7 +81,7 @@ def _register_validator(key, *keys, **kwargs):
 def register_postload_hook(hook):
     _CONFIG_POSTLOAD_HOOKS.append(hook)
 
-@_register_validator("root_dir", "experiment_dir", "global_cache_dir", file_ok=False)
+@_register_validator("paths.root_dir", "paths.experiments_dir", "paths.global_cache_dir", file_ok=False)
 def _check_path(filename, dir_ok=True, file_ok=True):
     path = Path(filename)
     if not path.exists():
