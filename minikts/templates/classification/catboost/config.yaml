@@ -1,0 +1,25 @@
+general:
+  debug: False
+  gpus: [0]
+
+paths:
+  root_dir: &root ~/workdir
+  experiments_dir: !join_path [*root, experiments]
+  global_cache_dir: !join_path [*root, global_cache]
+
+hparams:
+  catboost: 
+    iterations: 1000
+
+  split:
+    n_splits: 5
+    shuffle: True
+    random_state: 42
+
+profiler:
+  verbose: False
+
+neptune:
+  api_token: !env NEPTUNE_API_TOKEN
+  project_name: "konodyuk/minikts-test-project"
+  tags: ["gh-actions-testing-catboost"]
