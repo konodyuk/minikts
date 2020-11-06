@@ -222,8 +222,16 @@ def argument_mapper(**kwargs):
         return res
     return _argument_mapper
 
+def process_cache(feature):
+    """Caches input feature in scope of current process"""
+    raise NotImplementedError()
+    def _cached(df, **k):
+        res = _call(feature, df, **k)
+        return res
+    return _cached
+
 def local_cache(feature):
-    """Caches input feature in scope of current run"""
+    """Caches input feature in scope of current experiment"""
     raise NotImplementedError()
     def _cached(df, **k):
         res = _call(feature, df, **k)
