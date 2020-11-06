@@ -16,7 +16,7 @@ setuptools.setup(
         "dill",
         "numpy",
         "pandas",
-        "neptune-client",
+        "neptune-client<=0.4.117",
     ],
     entry_points={
         "console_scripts": ["minikts=minikts.cli:cli"]
