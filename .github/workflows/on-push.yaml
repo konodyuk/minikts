@@ -44,5 +44,7 @@ jobs:
       run: |
         python setup.py develop
     - name: Run templates
+      env:
+        NEPTUNE_API_TOKEN: ${{ secrets.NEPTUNE_API_TOKEN }}
       run: |
         bash minikts/templates/run_templates.sh
