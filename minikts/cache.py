@@ -64,12 +64,16 @@ class DiskCache(AbstractCache):
 class LocalCache(DiskCache):
     @property
     def dir(self):
-        return config.general.experiment_dir / "local_cache"
+        res_path = config.paths.experiment_dir / "local_cache"
+        res_path.mkdir(exist_ok=True)
+        return res_path
 
 class GlobalCache(DiskCache):
     @property
     def dir(self):
-        return config.general.global_cache_dir
+        res_path = config.paths.global_cache_dir
+        res_path.mkdir(exist_ok=True)
+        return res_path
 
 class CombinedCache(AbstractCache):
     def __init__(self, caches):
