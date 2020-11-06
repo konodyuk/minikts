@@ -16,6 +16,7 @@ setuptools.setup(
         "dill",
         "numpy",
         "pandas",
+        "neptune",
     ],
     entry_points={
         "console_scripts": ["minikts=minikts.cli:cli"]
