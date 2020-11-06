@@ -9,7 +9,7 @@ paths:
 
 hparams:
   catboost: 
-    iterations: 1000
+    iterations: 20
 
   split:
     n_splits: 5
