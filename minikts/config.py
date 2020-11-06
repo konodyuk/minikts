@@ -94,7 +94,7 @@ def register_postload_hook(hook):
 
 @_register_validator("paths.root_dir", "paths.experiments_dir", "paths.global_cache_dir", file_ok=False)
 def _check_path(filename, dir_ok=True, file_ok=True):
-    path = Path(filename)
+    path = Path(filename).expanduser().resolve()
     if not path.exists():
         raise ConfigError(f"{filename} does not exist.")
     if not dir_ok and path.is_dir():
