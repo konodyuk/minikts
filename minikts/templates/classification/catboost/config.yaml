@@ -3,7 +3,7 @@ general:
   gpus: [0]
 
 paths:
-  root_dir: &root ~/workdir
+  root_dir: &root TEMPLATE_ROOT_DIR
   experiments_dir: !join_path [*root, experiments]
   global_cache_dir: !join_path [*root, global_cache]
 
