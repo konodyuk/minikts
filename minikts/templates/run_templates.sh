@@ -1,10 +1,13 @@
-mkdir ~/workdir
-mkdir ~/workdir/experiments
-mkdir ~/workdir/global_cache
+mkdir ~/testdir
+cd ~/testdir
 
-cd ~/work/minikts/minikts/minikts/templates/classification/catboost/
-bash ./run.sh
-# bash regression/lightgbm/run.sh
-# bash recsys/lightfm/run.sh
-# bash recsys/implicit/run.sh
-# bash recsys/caserec/run.sh
+templates=(
+    classification/catboost
+)
+
+for name in "${!templates[@]}"; do
+    rm -rf ./*
+    minikts template "$name"
+    pip install -r requirements.txt
+    python src/main.py train test
+done
