@@ -23,6 +23,7 @@ class AbstractCache(abc.ABC):
         raise NotImplementedError()
 
 class ProcessCache(AbstractCache):
+    """Caches items in scope of current process."""
     def __init__(self):
         self.data = dict()
 
@@ -39,6 +40,7 @@ class ProcessCache(AbstractCache):
         return self.load_object(key)
 
 class DiskCache(AbstractCache):
+    """Caches items on disk."""
     def save_object(self, obj, key):
         key = self._filter_key(key)
         dill.dump(obj, open(self.dir / (key + ".dill"), "wb"))
@@ -62,6 +64,7 @@ class DiskCache(AbstractCache):
         return key
 
 class LocalCache(DiskCache):
+    """Caches items in scope of current experiment."""
     @property
     def dir(self):
         res_path = config.paths.experiment_dir / "local_cache"
@@ -69,6 +72,7 @@ class LocalCache(DiskCache):
         return res_path
 
 class GlobalCache(DiskCache):
+    """Caches items in scope of current project."""
     @property
     def dir(self):
         res_path = config.paths.global_cache_dir
