@@ -4,8 +4,8 @@ import pkg_resources
 from pathlib import Path
 
 TEMPLATES = [
-    "classification/catboost",
-    "deeplearning/pytorch_lightning",
+    "catboost",
+    "pytorch_lightning",
 ]
 
 TEMPLATE_FILES = [

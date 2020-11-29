@@ -2,7 +2,7 @@ mkdir ~/testdir
 cd ~/testdir
 
 templates=(
-    classification/catboost
+    catboost
 )
 
 for name in "${templates[@]}"; do
