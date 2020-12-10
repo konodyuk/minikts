@@ -96,7 +96,7 @@ class CombinedCache(AbstractCache):
 
     def save_dataframe(self, df, key):
         for cache in self.caches:
-            cache.save_dataframe(obj, key)
+            cache.save_dataframe(df, key)
 
     def load_dataframe(self, key):
         for cache in self.caches:
