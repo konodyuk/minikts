@@ -93,6 +93,7 @@ class CombinedCache(AbstractCache):
                 return cache.load_object(key)
             except:
                 pass
+        raise KeyError(key)
 
     def save_dataframe(self, df, key):
         for cache in self.caches:
@@ -104,6 +105,7 @@ class CombinedCache(AbstractCache):
                 return cache.load_dataframe(key)
             except:
                 pass
+        raise KeyError(key)
 
 process_cache = ProcessCache()
 local_cache = LocalCache()
