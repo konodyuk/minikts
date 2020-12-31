@@ -25,9 +25,9 @@ class Patterns:
         ...     model.fit(interactions, epochs=100, verbose=True)
     """
 
-    catboost = ("learn: {train:f}", "test: {valid:f}", "{step:d}:")
-    xgboost_valid_only = ("valid{}:{valid:f}", "[{step:d}]")
-    lightgbm_valid_only = ("valid{}:{valid:f}", "[{step:d}]")
-    xgboost = ("valid{}0{}:{train:f}", "valid{}1{}:{valid:f}", "[{step:d}]")
-    lightgbm = ("valid{}0{}:{train:f}", "valid{}1{}:{valid:f}", "[{step:d}]")
+    catboost = ("learn: {train:g}", "test: {valid:g}", "{step:d}:")
+    xgboost_valid_only = ("valid{}:{valid:g}", "[{step:d}]")
+    lightgbm_valid_only = ("valid{}:{valid:g}", "[{step:d}]")
+    xgboost = ("valid{}0{}:{train:g}", "valid{}1{}:{valid:g}", "[{step:d}]")
+    lightgbm = ("valid{}0{}:{train:g}", "valid{}1{}:{valid:g}", "[{step:d}]")
     lightfm = ("{}{epoch:d}", "{}{step:d}")
