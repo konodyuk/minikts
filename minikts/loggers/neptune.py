@@ -13,14 +13,15 @@ class NeptuneLogger:
         project_name: Optional[str] = None, 
         tags: Optional[str] = None,
         verbose: bool = False,
-        dry_run: bool = False
-        **kwargs
+        dry_run: bool = False,
+        **kwargs,
     ):
         self.api_key = api_key
         self.project_name = project_name
         self.tags = tags
         self.verbose = verbose
         self.dry_run = dry_run
+        self.kwargs = kwargs
         self.experiment = self.create_experiment()
 
     @property
@@ -75,5 +76,6 @@ class NeptuneLogger:
             tags=self.tags,
             params=_flatten_box(config.hparams),
             upload_source_files=list(ctx.tracked_filenames),
+            **self.kwargs,
         )
         ctx.switch_workdir(ctx.experiments_dir / self.id, create=True)
