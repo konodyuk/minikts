@@ -1,46 +1,50 @@
-import os
-from pathlib import Path
-
-import shutil
-import neptune
+try:
+    import neptune
+except ImportError:
+    neptune = None
 
 from minikts.config import config, register_postload_hook
 from minikts.utils import _flatten_box
+from minikts.context import ctx
 
-class Logger:
-    def __init__(self):
-        self.experiment = None
-        self._neptune_initialized = False
-        self._neptune_experiment_id = None
-
-    @property
-    def _neptune_experiment_created(self):
-        return self.experiment is not None
+class NeptuneLogger:
+    def __init__(self, 
+        api_key: Optional[str] = None, 
+        project_name: Optional[str] = None, 
+        tags: Optional[str] = None,
+        verbose: bool = False,
+        dry_run: bool = False
+        **kwargs
+    ):
+        self.api_key = api_key
+        self.project_name = project_name
+        self.tags = tags
+        self.verbose = verbose
+        self.dry_run = dry_run
+        self.experiment = self.create_experiment()
 
     @property
     def id(self):
-        if config.general.inside_existing_experiment:
-            return config.paths.source_file.parent.name
+        if ctx.inside_existing_experiment:
+            return ctx.script_path.parent.name
+        if self.dry_run:
+            return "debug"
         return self.experiment.id
-    
-    def initialize(self):
-        config.paths.experiment_dir = config.paths.experiments_dir / "DEBUG"
-        config.paths.experiment_dir.mkdir(exist_ok=True)
 
     def log_metric(self, log_name, x, y=None, timestamp=None):
-        if config.general.debug:
+        if self.verbose:
             print(f"log_metric({log_name}, {x}, {y})")
             return
         self.experiment.log_metric(log_name, x, y, timestamp)
 
     def log_text(self, log_name, x, y=None, timestamp=None):
-        if config.general.debug:
+        if self.verbose:
             print(f"log_text({log_name}, {x}, {y})")
             return
         self.experiment.log_text(log_name, x, y, timestamp)
 
     def log_image(log_name, x, y=None, image_name=None, description=None, timestamp=None):
-        if config.general.debug:
+        if self.verbose:
             x = x.shape if hasattr(x, 'shape') else None
             y = y.shape if hasattr(y, 'shape') else None
             print(f"log_image({log_name}, {x}, {y})")
@@ -48,61 +52,28 @@ class Logger:
         self.experiment.log_image(log_name, x, y, image_name, description, timestamp)
 
     def log_artifact(artifact, destination=None):
-        if config.general.debug:
+        if self.verbose:
             print(f"log_artifact()")
             return
         self.experiment.log_artifact(artifact, destination)
 
-    def set_experiment_dir(self, dir_path=None):
-        dir_path = dir_path or config.paths.experiments_dir / self.id
-        config.paths.experiment_dir = Path(dir_path).resolve()
-        config.paths.experiment_dir.mkdir(exist_ok=True)
-        os.chdir(config.paths.experiment_dir)
-
-    def get_tmp_dir(self):
-        tmp_dir = config.paths.tmp_dir = config.paths.root_dir / ".minikts"
-        tmp_dir.mkdir(exist_ok=True)
-        return tmp_dir
-
-    def copy_sources_to_dir(self, dir_path):
-        for tracking_filename, os_filename in config.general.tracked_files.items():
-            shutil.copy(os_filename, dir_path / tracking_filename)
-
     def create_experiment(self):
-        if config.general.debug:
-            return
-        if not self._neptune_initialized:
+        if self.dry_run:
             neptune.init(
-                api_token=config.neptune.api_token, 
-                project_qualified_name=config.neptune.project_name
+                project_qualified_name="dry-run/debug",
+                backend=neptune.OfflineBackend()
             )
-        if self._neptune_experiment_created:
-            return
-
-        self.copy_sources_to_dir(self.get_tmp_dir())
-        prev_dir = os.getcwd()
-        os.chdir(config.paths.tmp_dir)
-        self.experiment = neptune.create_experiment(
-            tags=config.neptune.tags,
-            params=_flatten_box(config.hparams),
-            upload_source_files=list(config.general.tracked_files.keys()),
-        )
-        self.set_experiment_dir()
-
-logger = Logger()
-register_postload_hook(logger.initialize)
-
-def _create_neptune_experiment():
-    logger.create_experiment()
-
-def _change_experiment_dir(experiment_dir=None):
-    def _inner():
-        if callable(experiment_dir):
-            _experiment_dir = experiment_dir()
         else:
-            _experiment_dir = experiment_dir
-        logger.set_experiment_dir(_experiment_dir)
-    return _inner
+            neptune.init(
+                api_token=self.api_token,
+                project_qualified_name=self.project_name,
+            )
 
-def _copy_sources():
-    logger.copy_sources_to_dir(config.paths.experiment_dir)
+        ctx.copy_sources(dest_dir=ctx.tmp_dir)
+        ctx.switch_workdir(ctx.tmp_dir)
+        self.experiment = neptune.create_experiment(
+            tags=self.tags,
+            params=_flatten_box(config.hparams),
+            upload_source_files=list(ctx.tracked_filenames),
+        )
+        ctx.switch_workdir(ctx.experiments_dir / self.id, create=True)
