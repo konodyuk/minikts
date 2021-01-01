@@ -5,7 +5,7 @@ try:
 except ImportError:
     neptune = None
 
-from minikts.config import config, register_postload_hook
+from minikts.config import config, hparams
 from minikts.utils import _flatten_box
 from minikts.context import ctx
 
@@ -28,7 +28,7 @@ class NeptuneLogger:
 
     @property
     def id(self):
-        if ctx.inside_existing_experiment:
+        if ctx.is_inside_experiment:
             return ctx.script_path.parent.name
         if self.dry_run:
             return "debug"
@@ -46,7 +46,7 @@ class NeptuneLogger:
             return
         self.experiment.log_text(log_name, x, y, timestamp)
 
-    def log_image(log_name, x, y=None, image_name=None, description=None, timestamp=None):
+    def log_image(self, log_name, x, y=None, image_name=None, description=None, timestamp=None):
         if self.verbose:
             x = x.shape if hasattr(x, 'shape') else None
             y = y.shape if hasattr(y, 'shape') else None
@@ -54,7 +54,7 @@ class NeptuneLogger:
             return
         self.experiment.log_image(log_name, x, y, image_name, description, timestamp)
 
-    def log_artifact(artifact, destination=None):
+    def log_artifact(self, artifact, destination=None):
         if self.verbose:
             print(f"log_artifact()")
             return
@@ -76,8 +76,9 @@ class NeptuneLogger:
         ctx.switch_workdir(ctx.tmp_dir)
         self.experiment = neptune.create_experiment(
             tags=self.tags,
-            params=_flatten_box(config.hparams),
+            params=_flatten_box(hparams),
             upload_source_files=list(ctx.tracked_filenames),
             **self.kwargs,
         )
-        ctx.switch_workdir(ctx.experiments_dir / self.id, create=True)
+        if ctx.experiments_dir is not None:
+            ctx.switch_workdir(ctx.experiments_dir / self.id, create=True)
