@@ -2,6 +2,8 @@ import abc
 import click
 import functools
 
+from minikts.context import ctx
+
 class CLIMeta(abc.ABCMeta):
     def __new__(cls, name, bases, members):
         click_params = members["__click_params__"] = dict()
