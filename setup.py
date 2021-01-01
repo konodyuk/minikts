@@ -29,7 +29,7 @@ setuptools.setup(
         "pandas",
     ],
     entry_points={
-        "console_scripts": ["minikts=minikts.cli:cli"]
+        "console_scripts": ["minikts=minikts.main:cli"]
     },
     include_package_data=True
 )
