@@ -14,6 +14,6 @@ class LoggerCallback:
                 continue
             fmt_key = f"{key}_{self.suffix}"
             if step is not None:
-                logger.log_metric(fmt_key, step, value)
+                self.logger.log_metric(fmt_key, step, value)
             else:
-                logger.log_metric(fmt_key, value)
+                self.logger.log_metric(fmt_key, value)
