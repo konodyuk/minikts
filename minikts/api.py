@@ -6,5 +6,5 @@ from minikts.debug import debug
 from minikts.experiment import Experiment, endpoint, option
 from minikts.logging.callbacks import *
 from minikts.logging.logger import logger
-from minikts.logging.parsing import parse_stdout, Patterns as patterns
+from minikts.parsing import parse_stdout, Patterns as patterns
 from minikts.profiler import profile, profiler
