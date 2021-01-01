@@ -17,11 +17,12 @@ yaml.SafeLoader.add_constructor('!join_path', _join_path)
 yaml.SafeLoader.add_constructor('!env', _get_from_env)
 
 _CONFIG_FILENAME = None
+_CONFIG_POSTLOAD_HOOKS = []
 
 config = Box(box_dots=True)
 hparams = Box(box_dots=True)
 
-def load_config(filename):
+def load_config(filename, postload_hooks=True):
     global _CONFIG_FILENAME
     _CONFIG_FILENAME = filename
     loaded_config = Box.from_yaml(
@@ -34,6 +35,10 @@ def load_config(filename):
     if "hparams" in loaded_config:
         hparams.merge_update(loaded_config.hparams)
 
+    if postload_hooks:
+        for hook in _CONFIG_POSTLOAD_HOOKS:
+            hook()
+
     _CONFIG_FILENAME = None
 
 class ConfigError(UserWarning):
@@ -41,3 +46,6 @@ class ConfigError(UserWarning):
         message = f"{message}\nError occured while parsing {_CONFIG_FILENAME}"
         super().__init__(message)
 
+def register_postload_hook(hook):
+    _CONFIG_POSTLOAD_HOOKS.append(hook)
+    return hook
