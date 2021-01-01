@@ -24,7 +24,7 @@ class NeptuneLogger:
         self.verbose = verbose
         self.dry_run = dry_run
         self.kwargs = kwargs
-        self.experiment = self.create_experiment()
+        self.create_experiment()
 
     @property
     def id(self):
