@@ -3,7 +3,7 @@ import abc
 import dill
 import pandas as pd
 
-from minikts.config import config
+from minikts.context import ctx
 
 class AbstractCache(abc.ABC):
     @abc.abstractmethod
@@ -67,7 +67,7 @@ class LocalCache(DiskCache):
     """Caches items in scope of current experiment."""
     @property
     def dir(self):
-        res_path = config.paths.experiment_dir / "local_cache"
+        res_path = ctx.workdir / "local_cache"
         res_path.mkdir(exist_ok=True)
         return res_path
 
@@ -75,7 +75,7 @@ class GlobalCache(DiskCache):
     """Caches items in scope of current project."""
     @property
     def dir(self):
-        res_path = config.paths.global_cache_dir
+        res_path = ctx.global_cache_dir
         res_path.mkdir(exist_ok=True)
         return res_path
 
