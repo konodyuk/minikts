@@ -51,7 +51,8 @@ class Context:
         return self.experiments_dir in self.script_path.parents
 
     def switch_workdir(self, path: Union[Path, str], create: bool = False):
-        path = Path(path)
+        path = self._convert_resolve_path(path)
+        print(f"[CTX: Switch Workdir] {self.workdir} -> {path}")
         if create:
             path.mkdir(parents=True, exist_ok=True)
         if not path.exists():
@@ -68,7 +69,10 @@ class Context:
         dest_dir = dest_dir or self.workdir
         
         for filename in filenames:
-            shutil.copy(src_dir / filename, dest_dir / filename)
+            src_file = src_dir / filename
+            dest_file = dest_dir / filename
+            print(f"[CTX: Copy Sources] {src_file} -> {dest_file}")
+            shutil.copy(src_file, dest_file)
     
     @staticmethod
     def _join_path_assert_exists(path: Path, name: str):
