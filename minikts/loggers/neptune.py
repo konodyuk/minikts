@@ -11,14 +11,14 @@ from minikts.context import ctx
 
 class NeptuneLogger:
     def __init__(self, 
-        api_key: Optional[str] = None, 
+        api_token: Optional[str] = None,
         project_name: Optional[str] = None, 
         tags: Optional[str] = None,
         verbose: bool = False,
         dry_run: bool = False,
         **kwargs,
     ):
-        self.api_key = api_key
+        self.api_token = api_token
         self.project_name = project_name
         self.tags = tags
         self.verbose = verbose
