@@ -21,10 +21,13 @@ from catboost import CatBoostClassifier
 from catboost.datasets import titanic
 
 import minikts.api as kts
-from minikts.api import stl, config, hparams
+from minikts.api import stl, config, hparams, CLI, ctx
 from minikts import utils
 
-kts.init(__file__)
+kts.init(
+    script_path=__file__,
+    root_dir="..",
+)
 cache = kts.fast_local_cache
 
 # ========== FEATURES ==========
@@ -106,12 +109,12 @@ class CatBoostTemplateDataset():
 
 # ========== EXPERIMENT ==========
 
-class CatBoostTemplateExperiment(kts.Experiment):
+class CatBoostTemplateExperiment(CLI):
     @kts.profile()
     def train_fold(self, data, fold_idx):
         x_train, y_train, x_val, y_val = data
         model = CatBoostClassifier(**hparams.catboost)
-        with kts.parse_stdout(kts.patterns.catboost, kts.NeptuneCallback(FOLD=fold_idx)):
+        with kts.parse_stdout(kts.patterns.catboost, kts.LoggerCallback(logger=self.logger, FOLD=fold_idx)):
             model.fit(x_train, y_train, eval_set=[(x_val, y_val)])
         return model
 
@@ -120,7 +123,7 @@ class CatBoostTemplateExperiment(kts.Experiment):
         x_train, y_train, x_val, y_val = data
         y_pred = model.predict_proba(x_val)[:, 1]
         score = roc_auc_score(y_val, y_pred)
-        kts.logger.log_metric("ROC", fold_idx, score)
+        self.logger.log_metric("ROC", fold_idx, score)
 
     def dataset(self):
         return CatBoostTemplateDataset()
@@ -136,7 +139,7 @@ class CatBoostTemplateExperiment(kts.Experiment):
         raw_outputs = pd.DataFrame(outputs)
         mean_outputs = pd.DataFrame(outputs.mean(axis=1))
         raw_outputs.to_csv("preds.csv", index=False)
-        mean_outputs.to_csv(f"submission_{kts.logger.id}.csv", index=False)
+        mean_outputs.to_csv(f"submission_{self.logger.id}.csv", index=False)
 
     @kts.profile()
     def save_model(self, model, fold_idx):
@@ -146,18 +149,24 @@ class CatBoostTemplateExperiment(kts.Experiment):
     def load_model(self, fold_idx):
         return cache.load_object(f"model_{fold_idx}")
 
-    @kts.endpoint(create_neptune_experiment=True, copy_sources=True)
+    @kts.config_option()
     @kts.profile()
-    def train(self):
+    def train(self, config_path):
+        kts.load_config(config_path)
+        self.logger = kts.NeptuneLogger(**config.neptune)
+        ctx.copy_sources()
+
         dataset = self.dataset()
         for data, fold_idx in dataset.train_folds():
             model = self.train_fold(data, fold_idx)
             self.save_model(model, fold_idx)
             self.score_fold(model, data, fold_idx)
 
-    @kts.endpoint(create_neptune_experiment=False, copy_sources=False)
+    @kts.config_option()
     @kts.profile()
-    def test(self):
+    def test(self, config_path):
+        kts.load_config(config_path)
+
         dataset = self.dataset()
         outputs = list()
         for data, fold_idx in dataset.test_folds():
@@ -165,12 +174,13 @@ class CatBoostTemplateExperiment(kts.Experiment):
             outputs.append(self.predict_fold(model, data, fold_idx))
         self.postprocess(outputs)
 
-    @kts.endpoint(
-        create_neptune_experiment=False, 
-        copy_sources=True, 
-        experiment_dir=lambda: utils.find_next_of_format("BLEND-{:d}", dir_path=config.paths.root_dir / "blends")
-    )
-    def ensemble(self, experiment_ids=[9,10]):
+    @kts.config_option()
+    def ensemble(self, config_path, experiment_ids=[9, 10]):
+        kts.load_config(config_path)
+        blend_workdir = utils.find_next_of_format("BLEND-{:d}", parent_dir=ctx.root_dir / "blends")
+        ctx.switch_workdir(blend_workdir)
+        ctx.copy_sources()
+
         res = 0
         for experiment_id in experiment_ids:
             experiment_path = utils.get_experiment_path(f"MIN-{experiment_id}")
