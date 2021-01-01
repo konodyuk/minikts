@@ -1,9 +1,8 @@
 import importlib
 from pathlib import Path
 
-from minikts.config import init, load_config
-
 def debug(source_dir=None, main_path=None, config_path=None):
+    raise NotImplementedError()
     """Imports experiment source as a module
 
     Args:
