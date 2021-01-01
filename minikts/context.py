@@ -48,6 +48,8 @@ class Context:
     
     @property
     def is_inside_experiment(self):
+        if self.script_path is None:
+            return False
         return self.experiments_dir in self.script_path.parents
 
     def switch_workdir(self, path: Union[Path, str], create: bool = False):
