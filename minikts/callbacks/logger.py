@@ -1,9 +1,8 @@
-from minikts.logging.logger import logger
-
-class NeptuneCallback:
-    def __init__(self, *args, ignore_keys=["step"], **kwargs):
+class LoggerCallback:
+    def __init__(self, *args, logger, ignore_keys=["step"], **kwargs):
         self.args = args
         self.ignore_keys = ignore_keys
+        self.logger = logger
         self.kwargs = kwargs
         self.suffix = '_'.join(list(map(str, args))) 
         self.suffix += '_'.join([f"{key}={value}" for key, value in kwargs.items()])
