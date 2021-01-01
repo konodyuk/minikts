@@ -1,4 +1,4 @@
-import  attr
+import attr
 import libtmux
 
 @attr.s
@@ -27,7 +27,7 @@ class Session:
 @attr.s
 class GPUSession:
     gpu = attr.ib(type=int)
-    def _attrs_post_init_(self):
+    def __attrs_post_init__(self):
         self.name = f"{self.name}-{self.gpu}"
         self.setup_cmd = f"export CUDA_VISIBLE_DEVICES={self.gpu}"
 
