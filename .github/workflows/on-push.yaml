@@ -42,7 +42,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install package and dependencies
       run: |
-        python setup.py develop
+        python -m pip install -e .[all]
     - name: Run templates
       env:
         NEPTUNE_API_TOKEN: ${{ secrets.NEPTUNE_API_TOKEN }}
