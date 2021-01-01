@@ -3,10 +3,10 @@ import parse
 
 from minikts.config import config
 
-def find_next_of_format(fmt, paths=None, dir_path=None):
-    if dir_path is not None:
+def find_next_of_format(fmt, paths=None, parent_dir=None):
+    if parent_dir is not None:
         assert paths is None
-        paths = list(os.listdir(dir_path))
+        paths = list(os.listdir(parent_dir))
     assert paths is not None
     used_numbers = list()
     for path in paths:
@@ -17,9 +17,9 @@ def find_next_of_format(fmt, paths=None, dir_path=None):
     while (next_number < len(used_numbers)
            and next_number == used_numbers[next_number]):
         next_number += 1
-    if dir_path is None:
+    if parent_dir is None:
         return fmt.format(next_number)
-    return dir_path / fmt.format(next_number)
+    return parent_dir / fmt.format(next_number)
 
 def get_experiment_path(experiment_id):
     return config.paths.experiments_dir / experiment_id
