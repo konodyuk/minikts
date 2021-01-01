@@ -56,3 +56,18 @@ class CLI(metaclass=CLIMeta):
             _cli.command(name)(wrapped)
             
         _cli(standalone_mode=False, **kwargs)
+
+def config_option(arg_name="config_path"):
+    result = click.option(
+        "--config",
+        arg_name,
+        default=ctx.script_path.parent / "config.yaml",
+        show_default=True,
+        type=click.Path(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            resolve_path=True
+        ),
+    )
+    return result
