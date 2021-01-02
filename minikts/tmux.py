@@ -25,7 +25,7 @@ class Session:
         self.tmux.exec_in_session(cmd, self.name)
 
 @attr.s
-class GPUSession:
+class GPUSession(Session):
     gpu = attr.ib(type=int)
     def __attrs_post_init__(self):
         self.name = f"{self.name}-{self.gpu}"
