@@ -8,7 +8,7 @@ hparams:
     random_state: 42
 
 profiler:
-  verbose: False
+  verbose: True
 
 neptune:
   api_token: !env NEPTUNE_API_TOKEN
