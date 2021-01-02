@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from minikts.config import register_postload_hook, config
+from minikts.monitoring import report, report_table
 
 @attr.s
 class Profiler:
@@ -63,7 +64,7 @@ def set_profiler_options():
 def on_start_print(data, verbose=True, **k):
     if not verbose:
         return
-    print(f"Step {data.name} started")
+    report("prof", f"Step [bold]{data.name}[/] started")
 
 @profiler.pre_callback
 def on_start_set_timer(data, **k):
@@ -86,7 +87,7 @@ def on_stop_save_timing(data, **k):
 def on_stop_print(data, verbose=True, **k):
     if not verbose:
         return
-    print(f"Step {data.name} finished, took {data.timing}")
+    report("prof", f"Step [bold]{data.name}[/] finished, took [bold green]{data.timing:.5f}s[/]")
 
 @profiler.final_callback
 def on_finish_print(profiler_data, **k):
@@ -94,13 +95,13 @@ def on_finish_print(profiler_data, **k):
     for name, method_data in profiler_data.items():
         timing_report.append({
             "name": name,
-            "sum_time": np.sum(method_data.timings),
+            "sum_time (s)": np.sum(method_data.timings),
             "n_calls": method_data.calls,
-            "mean_time": np.mean(method_data.timings),
-            "max_time": np.max(method_data.timings),
+            "mean_time (s)": np.mean(method_data.timings),
+            "max_time (s)": np.max(method_data.timings),
         })
     timing_report = pd.DataFrame(timing_report)
     if timing_report.empty:
         return
-    timing_report.sort_values("sum_time", inplace=True, ascending=False)
-    print(timing_report)
+    timing_report.sort_values("sum_time (s)", inplace=True, ascending=False)
+    report_table("profiler report", timing_report)
