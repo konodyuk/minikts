@@ -6,6 +6,8 @@ from pathlib import Path
 from box import Box
 from box.converters import yaml
 
+from minikts.monitoring import report, shorten_path
+
 def _join_path(loader, node):
     seq = loader.construct_sequence(node)
     return Path().joinpath(*seq)
@@ -30,6 +32,7 @@ def load_config(filename, postload_hooks=True):
         box_dots=True,
         Loader=yaml.SafeLoader
     )
+    report("config", f"Loaded config from [bold magenta]{shorten_path(filename)}[/]")
 
     config.merge_update(loaded_config)
     if "hparams" in loaded_config:
