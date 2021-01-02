@@ -8,6 +8,7 @@ except ImportError:
 from minikts.config import config, hparams
 from minikts.utils import _flatten_box
 from minikts.context import ctx
+from minikts.monitoring import report
 
 class NeptuneLogger:
     def __init__(self, 
@@ -36,13 +37,13 @@ class NeptuneLogger:
 
     def log_metric(self, log_name, x, y=None, timestamp=None):
         if self.verbose:
-            print(f"log_metric({log_name}, {x}, {y})")
+            report("logger", f"log_metric({log_name}, {x}, {y})")
             return
         self.experiment.log_metric(log_name, x, y, timestamp)
 
     def log_text(self, log_name, x, y=None, timestamp=None):
         if self.verbose:
-            print(f"log_text({log_name}, {x}, {y})")
+            report("logger", f"log_text({log_name}, {x}, {y})")
             return
         self.experiment.log_text(log_name, x, y, timestamp)
 
@@ -50,13 +51,13 @@ class NeptuneLogger:
         if self.verbose:
             x = x.shape if hasattr(x, 'shape') else None
             y = y.shape if hasattr(y, 'shape') else None
-            print(f"log_image({log_name}, {x}, {y})")
+            report("logger", f"log_image({log_name}, {x}, {y})")
             return
         self.experiment.log_image(log_name, x, y, image_name, description, timestamp)
 
     def log_artifact(self, artifact, destination=None):
         if self.verbose:
-            print(f"log_artifact()")
+            report("logger", f"log_artifact()")
             return
         self.experiment.log_artifact(artifact, destination)
 
