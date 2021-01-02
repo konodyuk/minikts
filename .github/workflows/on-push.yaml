@@ -36,15 +36,40 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install package and dependencies
+
+    - uses: actions/cache@v2
+      if: startsWith(runner.os, 'Linux')
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - uses: actions/cache@v2
+      if: startsWith(runner.os, 'macOS')
+      with:
+        path: ~/Library/Caches/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install requirements
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
-        python -m pip install -e .[all]
+        pip install -r requirements.txt
+        bash tests/templates/install.sh
+
+    - name: Install package
+      run: |
+        python setup.py develop
+
     - name: Run templates
       env:
         NEPTUNE_API_TOKEN: ${{ secrets.NEPTUNE_API_TOKEN }}
       run: |
-        bash minikts/templates/run_templates.sh
+        bash tests/templates/run.sh
