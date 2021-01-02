@@ -6,6 +6,8 @@ import shutil
 from pathlib import Path
 from typing import Optional, Union, List
 
+from minikts.monitoring import report, shorten_path
+
 @attr.s
 class Context:
     script_path = attr.ib(default=None, type=Path)
@@ -54,7 +56,7 @@ class Context:
 
     def switch_workdir(self, path: Union[Path, str], create: bool = False):
         path = self._convert_resolve_path(path)
-        print(f"[CTX: Switch Workdir] {self.workdir} -> {path}")
+        report("ctx", f"Switch workdir: [bold magenta]{shorten_path(self.workdir)}[/] -> [bold magenta]{shorten_path(path)}[/]")
         if create:
             path.mkdir(parents=True, exist_ok=True)
         if not path.exists():
@@ -73,7 +75,7 @@ class Context:
         for filename in filenames:
             src_file = src_dir / filename
             dest_file = dest_dir / filename
-            print(f"[CTX: Copy Sources] {src_file} -> {dest_file}")
+            report("ctx", f"Copy file: [bold magenta]{shorten_path(src_file)}[/] -> [bold magenta]{shorten_path(dest_file)}[/]")
             shutil.copy(src_file, dest_file)
     
     @staticmethod
