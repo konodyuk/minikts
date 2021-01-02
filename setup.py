@@ -20,6 +20,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     extras_require=extras,
     install_requires=[
+        "rich",
         "attrs",
         "click>=3.0",
         "parse",
