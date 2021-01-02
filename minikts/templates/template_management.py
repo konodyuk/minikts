@@ -34,13 +34,6 @@ def init_template(template_name):
         path = get_resource_path(template_name, filename)
         shutil.copy(path, source_dir / filename)
 
-    config_path = cwd / "src" / "config.yaml"
-    with open(config_path, "r") as f:
-        config_text = f.read()
-    config_text = config_text.replace("TEMPLATE_ROOT_DIR", str(cwd))
-    with open(config_path, "w") as f:
-        f.write(config_text)
-
 def get_resource_path(template_name, filename):
     templates_path = pkg_resources.resource_filename("minikts", "templates")
     templates_path = Path(templates_path)
