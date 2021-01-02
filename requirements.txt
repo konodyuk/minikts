@@ -1,0 +1,11 @@
+rich
+attrs
+click>=3.0
+parse
+python-box[ruamel.yaml]>=5.0.0
+dill
+numpy
+pandas
+neptune-client<=0.4.117
+PyJWT<=1.6.4
+libtmux
