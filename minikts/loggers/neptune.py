@@ -29,8 +29,6 @@ class NeptuneLogger:
 
     @property
     def id(self):
-        if ctx.is_inside_experiment:
-            return ctx.script_path.parent.name
         if self.dry_run:
             return "debug"
         return self.experiment.id
