@@ -2,6 +2,8 @@ import attr
 import libtmux
 from typing import Optional
 
+from minikts.monitoring import report
+
 @attr.s
 class Tmux:
     server = attr.ib(factory=libtmux.Server)
@@ -10,6 +12,7 @@ class Tmux:
         session = self.server.find_where({"session_name": name})
         created = False
         if session is None:
+            report("tmux", f"Creating session [bold]{name}[/]")
             session = self.server.new_session(name)
             created = True
         return session, created
@@ -48,6 +51,7 @@ class Session:
                 if index is not None and window.index != str(index):
                     window.move_window(index)
                 return window
+        report("tmux", f"Creating window [bold]{name}[/] in session [bold]{name}[/]")
         return self._session.new_window(window_name=name, window_index=index, attach=False)
     
     def shift_all_windows(self, index_delta: int):
@@ -57,7 +61,10 @@ class Session:
             index_delta: shift length
         """
         for window in self._session.windows:
-            window.move_window(int(window_index) + index_delta)
+            old_index = int(window.index)
+            new_index = old_index + index_delta
+            report("tmux", f"Moving window [bold]{window.name}[/] from index [bold]{old_index}[/] to [bold]{new_index}[/] in session [bold]{name}[/]")
+            window.move_window(new_index)
             
     def close_windows(self):
         """Closes all windows in the session
@@ -68,6 +75,7 @@ class Session:
         self.get_or_create_window(name=sentinel, index=100)
         for window in self._session.windows:
             if window.name != sentinel:
+                report("tmux", f"[red]Killing[/] window [bold]{window.name}[/] in session [bold]{name}[/]")
                 window.kill_window()
 
 @attr.s
@@ -92,7 +100,7 @@ class Window:
         Args:
             cmd: command
         """
-        print(f"[{self.session_name}/{self.window_name}] $ {cmd}")
+        report("tmux", f"[{self.session_name}/{self.window_name}] $ {cmd}")
         self._window.attached_pane.send_keys(cmd)
         
     def move(self, index: int):
@@ -101,6 +109,7 @@ class Window:
         Args:
             index: desired index
         """
+        report("tmux", f"Moving window [bold]{self.window_name}[/] from index [bold]{self._window.index}[/] to [bold]{index}[/] in session [bold]{self.session_name}[/]")
         self._window.move_window(index)
         self.window_index = index
 
