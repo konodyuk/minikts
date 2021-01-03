@@ -66,17 +66,20 @@ class Session:
             report("tmux", f"Moving window [bold]{window.name}[/] from index [bold]{old_index}[/] to [bold]{new_index}[/] in session [bold]{self.name}[/]")
             window.move_window(new_index)
             
-    def close_windows(self):
+    def close_windows(self, leave_session: bool = True):
         """Closes all windows in the session
         
-        Leaves only one tmux-keep window at position 100 to prevent session from being closed.
+        Args:
+            leave_session: if set to True, prevents session from closing
         """
         sentinel = "tmux-keep"
-        self.get_or_create_window(name=sentinel, index=100)
+        if leave_session:
+            self.get_or_create_window(name=sentinel, index=100)
         for window in self._session.windows:
-            if window.name != sentinel:
-                report("tmux", f"[red]Killing[/] window [bold]{window.name}[/] in session [bold]{self.name}[/]")
-                window.kill_window()
+            if leave_session and window.name == sentinel:
+                continue
+            report("tmux", f"[red]Killing[/] window [bold]{window.name}[/] in session [bold]{self.name}[/]")
+            window.kill_window()
 
 @attr.s
 class Window:
