@@ -51,7 +51,7 @@ class Session:
                 if index is not None and window.index != str(index):
                     window.move_window(index)
                 return window
-        report("tmux", f"Creating window [bold]{name}[/] in session [bold]{name}[/]")
+        report("tmux", f"Creating window [bold]{name}[/] in session [bold]{self.name}[/]")
         return self._session.new_window(window_name=name, window_index=index, attach=False)
     
     def shift_all_windows(self, index_delta: int):
@@ -63,7 +63,7 @@ class Session:
         for window in self._session.windows:
             old_index = int(window.index)
             new_index = old_index + index_delta
-            report("tmux", f"Moving window [bold]{window.name}[/] from index [bold]{old_index}[/] to [bold]{new_index}[/] in session [bold]{name}[/]")
+            report("tmux", f"Moving window [bold]{window.name}[/] from index [bold]{old_index}[/] to [bold]{new_index}[/] in session [bold]{self.name}[/]")
             window.move_window(new_index)
             
     def close_windows(self):
@@ -75,7 +75,7 @@ class Session:
         self.get_or_create_window(name=sentinel, index=100)
         for window in self._session.windows:
             if window.name != sentinel:
-                report("tmux", f"[red]Killing[/] window [bold]{window.name}[/] in session [bold]{name}[/]")
+                report("tmux", f"[red]Killing[/] window [bold]{window.name}[/] in session [bold]{self.name}[/]")
                 window.kill_window()
 
 @attr.s
