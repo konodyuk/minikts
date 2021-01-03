@@ -17,6 +17,7 @@ class NeptuneLogger:
         tags: Optional[str] = None,
         verbose: bool = False,
         dry_run: bool = False,
+        create_workdir: bool = True,
         **kwargs,
     ):
         self.api_token = api_token
@@ -24,6 +25,7 @@ class NeptuneLogger:
         self.tags = tags
         self.verbose = verbose
         self.dry_run = dry_run
+        self.create_workdir = create_workdir
         self.kwargs = kwargs
         self.create_experiment()
 
@@ -79,5 +81,5 @@ class NeptuneLogger:
             upload_source_files=list(ctx.tracked_filenames),
             **self.kwargs,
         )
-        if ctx.experiments_dir is not None:
+        if self.create_workdir and ctx.experiments_dir is not None:
             ctx.switch_workdir(ctx.experiments_dir / self.id, create=True)
