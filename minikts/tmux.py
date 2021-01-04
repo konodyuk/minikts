@@ -103,7 +103,7 @@ class Window:
         Args:
             cmd: command
         """
-        report("tmux", f"[!tmux_name]\\[{self.session_name}/{self.window_name}] $[/] {cmd}")
+        report("tmux", f"[!tmux_name]\[{self.session_name}/{self.window_name}] $[/] {cmd}")
         self._window.attached_pane.send_keys(cmd)
         
     def move(self, index: int):
