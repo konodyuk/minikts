@@ -32,7 +32,7 @@ def load_config(filename, postload_hooks=True):
         box_dots=True,
         Loader=yaml.SafeLoader
     )
-    report("config", f"Loaded config from [bold magenta]{shorten_path(filename)}[/]")
+    report("config", f"Loaded config from [!path]{shorten_path(filename)}[/]")
 
     config.merge_update(loaded_config)
     if "hparams" in loaded_config:

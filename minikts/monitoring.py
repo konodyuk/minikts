@@ -1,13 +1,33 @@
 from rich import print
 from rich.table import Table
 
+_orange = "#F6BD4F"
+_magenta = "#FD6CF9"
+_red = "#FD6360"
+
+_styles = {
+    "!scope": f"bold {_orange}",
+    "!path": f"bold {_magenta}",
+    "!step": f"bold",
+    "!number": f"bold {_orange}",
+    "!time": f"bold {_orange}",
+    "!table_title": f"bold {_orange}",
+    "!tmux_name": f"bold",
+    "!alert": f"bold {_red}",
+}
+
+def _stylize(s: str):
+    for shortcut, style in _styles.items():
+        s = s.replace(shortcut, style)
+    return s
+
 def report(scope, message):
     scope = scope.upper().rjust(10)
-    print(f"[bold green]{scope}[/]", message)
+    print(_stylize(f"[!scope]{scope}[/]"), _stylize(message))
 
 def report_table(name, table):
-    title = f"[bold green]{name.upper()}[/]"
-    rich_table = Table(*table.columns, title=title)
+    title = f"[!table_title]{name.upper()}[/]"
+    rich_table = Table(*table.columns, title=_stylize(title))
     for _, row in table.iterrows():
         rich_table.add_row(*map(str, row.values))
     print(rich_table)

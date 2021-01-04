@@ -64,7 +64,7 @@ def set_profiler_options():
 def on_start_print(data, verbose=True, **k):
     if not verbose:
         return
-    report("prof", f"Step [bold]{data.name}[/] started")
+    report("prof", f"Step [!step]{data.name}[/] started")
 
 @profiler.pre_callback
 def on_start_set_timer(data, **k):
@@ -87,7 +87,7 @@ def on_stop_save_timing(data, **k):
 def on_stop_print(data, verbose=True, **k):
     if not verbose:
         return
-    report("prof", f"Step [bold]{data.name}[/] finished, took [bold green]{data.timing:.5f}s[/]")
+    report("prof", f"Step [!step]{data.name}[/] finished, took [!time]{data.timing:.5f}s[/]")
 
 @profiler.final_callback
 def on_finish_print(profiler_data, **k):

@@ -12,7 +12,7 @@ class Tmux:
         session = self.server.find_where({"session_name": name})
         created = False
         if session is None:
-            report("tmux", f"Creating session [bold]{name}[/]")
+            report("tmux", f"Creating session [!tmux_name]{name}[/]")
             session = self.server.new_session(name)
             created = True
         return session, created
@@ -51,7 +51,7 @@ class Session:
                 if index is not None and window.index != str(index):
                     window.move_window(index)
                 return window
-        report("tmux", f"Creating window [bold]{name}[/] in session [bold]{self.name}[/]")
+        report("tmux", f"Creating window [!tmux_name]{name}[/] in session [!tmux_name]{self.name}[/]")
         return self._session.new_window(window_name=name, window_index=index, attach=False)
     
     def shift_all_windows(self, index_delta: int):
@@ -63,7 +63,7 @@ class Session:
         for window in self._session.windows:
             old_index = int(window.index)
             new_index = old_index + index_delta
-            report("tmux", f"Moving window [bold]{window.name}[/] from index [bold]{old_index}[/] to [bold]{new_index}[/] in session [bold]{self.name}[/]")
+            report("tmux", f"Moving window [!tmux_name]{window.name}[/] from index [!number]{old_index}[/] to [!number]{new_index}[/] in session [!tmux_name]{self.name}[/]")
             window.move_window(new_index)
             
     def close_windows(self, leave_session: bool = True):
@@ -78,7 +78,7 @@ class Session:
         for window in self._session.windows:
             if leave_session and window.name == sentinel:
                 continue
-            report("tmux", f"[red]Killing[/] window [bold]{window.name}[/] in session [bold]{self.name}[/]")
+            report("tmux", f"[!alert]Killing[/] window [!tmux_name]{window.name}[/] in session [!tmux_name]{self.name}[/]")
             window.kill_window()
 
 @attr.s
@@ -112,7 +112,7 @@ class Window:
         Args:
             index: desired index
         """
-        report("tmux", f"Moving window [bold]{self.window_name}[/] from index [bold]{self._window.index}[/] to [bold]{index}[/] in session [bold]{self.session_name}[/]")
+        report("tmux", f"Moving window [!tmux_name]{self.window_name}[/] from index [!number]{self._window.index}[/] to [!number]{index}[/] in session [!tmux_name]{self.session_name}[/]")
         self._window.move_window(index)
         self.window_index = index
 
