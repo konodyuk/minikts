@@ -38,27 +38,23 @@ class NeptuneLogger:
     def log_metric(self, log_name, x, y=None, timestamp=None):
         if self.verbose:
             report("logger", f"log_metric({log_name}, {x}, {y})")
-            return
         self.experiment.log_metric(log_name, x, y, timestamp)
 
     def log_text(self, log_name, x, y=None, timestamp=None):
         if self.verbose:
             report("logger", f"log_text({log_name}, {x}, {y})")
-            return
         self.experiment.log_text(log_name, x, y, timestamp)
 
     def log_image(self, log_name, x, y=None, image_name=None, description=None, timestamp=None):
         if self.verbose:
-            x = x.shape if hasattr(x, 'shape') else None
-            y = y.shape if hasattr(y, 'shape') else None
-            report("logger", f"log_image({log_name}, {x}, {y})")
-            return
+            x_shape = x.shape if hasattr(x, 'shape') else None
+            y_shape = y.shape if hasattr(y, 'shape') else None
+            report("logger", f"log_image({log_name}, {x_shape}, {y_shape})")
         self.experiment.log_image(log_name, x, y, image_name, description, timestamp)
 
     def log_artifact(self, artifact, destination=None):
         if self.verbose:
             report("logger", f"log_artifact()")
-            return
         self.experiment.log_artifact(artifact, destination)
 
     def create_experiment(self):
