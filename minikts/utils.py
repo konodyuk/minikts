@@ -11,7 +11,8 @@ def find_next_of_format(fmt, paths=None, parent_dir=None):
     used_numbers = list()
     for path in paths:
         result = parse.search(fmt, path)
-        used_numbers.append(result.fixed[0])
+        if result is not None and len(result.fixed) > 0:
+            used_numbers.append(result.fixed[0])
     used_numbers = sorted(used_numbers)
     next_number = 0
     while (next_number < len(used_numbers)
